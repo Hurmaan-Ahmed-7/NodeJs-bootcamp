@@ -40,44 +40,121 @@ app.use(express.json());
 
 const tours = JSON.parse(fs.readFileSync(`./dev-data/data/tours-simple.json`));
 
-//sending json data to the client
-//upon request.
+// //sending json data to the client
+// //upon request.
 
-app.get('/api/v1/tours', (req, res) => {
-  res
-  .status(200)
-  .json({
-    status: 'success',
-    data: {
-      tours: tours
-    }
-  })
-});
+// app.get('/api/v1/tours', (req, res) => {
+//   res
+//   .status(200)
+//   .json({
+//     status: 'success',
+//     data: {
+//       tours: tours
+//     }
+//   })
+// });
 
-//accepting json data from the client
-//and writing it to the file upon client
-//request
+// //accepting json data from the client
+// //and writing it to the file upon client
+// //request
 
-app.post('/api/v1/tours', (req, res) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({id: newId}, req.body);
-  tours.push(newTour);
-  fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(tours), err => {
-    res
-    .status(201)
-    .json({
-        status: 'success',
-        data: {
-            tour: newTour 
-        }
-    })
-  });
-});
+// app.post('/api/v1/tours', (req, res) => {
+//   const newId = tours[tours.length - 1].id + 1;
+//   const newTour = Object.assign({id: newId}, req.body);
+//   tours.push(newTour);
+//   fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(tours), err => {
+//     res
+//     .status(201)
+//     .json({
+//         status: 'success',
+//         data: {
+//             tour: newTour 
+//         }
+//     })
+//   });
+// });
+
+// /////////////////////////////////////
+// //handling url params
+
+// app.get('/api/v1/tours/:id', (req, res) => {
+//     const id = parseInt(req.params.id, 10);
+    
+//     const tour = tours.find(function (el){
+        
+//         if(el.id == id){
+//             // console.log(el.id);
+//             return true;
+//         }
+//     });
+//     if(!tour){
+//         res
+//         .status(404)
+//         .json({
+//             status: '404 not found',
+//             data: {
+//                 tour
+//             }
+//         });
+//     }
+//     else{
+//     res
+//     .status(200)
+//     .json({
+//         status: 'success',
+//         data: {
+//             tour
+//         }
+//     });
+//     }
+    
+// });
+// /////////////////////////////////////
+// //handling patch requests
+
+// app.patch('/api/v1/tours/:id', (req, res) => {
+//     const id = parseInt(req.params.id, 10);
+//     const tour = tours.find(function (el){
+        
+//         if(el.id == id){
+//             // console.log(el.id);
+//             return true;
+//         }
+//     }); 
+//     //not implemented yet
+//     //incomplete......
+
+// });
 
 /////////////////////////////////////
-//handling url params
+//refractored version of the code above
 
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTours = (req, res) => {
+    res
+    .status(200)
+    .json({
+      status: 'success',
+      data: {
+        tours: tours
+      }
+    })
+}
+const createTour = (req, res) => {
+    const newId = tours[tours.length - 1].id + 1;
+    const newTour = Object.assign({id: newId}, req.body);
+    tours.push(newTour);
+    fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(tours), err => {
+      res
+      .status(201)
+      .json({
+          status: 'success',
+          data: {
+              tour: newTour 
+          }
+      })
+    });
+}
+const getTourById = (req, res) => {
     const id = parseInt(req.params.id, 10);
     
     const tour = tours.find(function (el){
@@ -107,24 +184,22 @@ app.get('/api/v1/tours/:id', (req, res) => {
         }
     });
     }
-    
-});
-/////////////////////////////////////
-//handling patch requests
+}
+const updateTourById = (req, res) => {
+    console.log('Incomplete');
+    //yet to be implemented
+    res.end();
+}
 
-app.patch('/api/v1/tours/:id', (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const tour = tours.find(function (el){
-        
-        if(el.id == id){
-            // console.log(el.id);
-            return true;
-        }
-    }); 
-    //not implemented yet
-    //incomplete......
+app
+  .route('/api/v1/tours')
+  .get(getTours)
+  .post(createTour)
 
-});
+app
+  .route('/api/v1/tours/:id')
+  .get(getTourById)
+  .patch(updateTourById)
 
 /////////////////////////////////////
 //listening on localhost
