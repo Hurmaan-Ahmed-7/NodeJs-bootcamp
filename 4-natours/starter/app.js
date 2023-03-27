@@ -73,9 +73,46 @@ app.post('/api/v1/tours', (req, res) => {
     })
   });
 });
+
+/////////////////////////////////////
+//handling url params
+
+app.get('/api/v1/tours/:id', (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    
+    const tour = tours.find(function (el){
+        
+        if(el.id == id){
+            console.log(el.id);
+            return true;
+        }
+    });
+    if(!tour){
+        res
+        .status(404)
+        .json({
+            status: '404 not found',
+            data: {
+                tour
+            }
+        });
+    }
+    else{
+    res
+    .status(200)
+    .json({
+        status: 'success',
+        data: {
+            tour
+        }
+    });
+    }
+    
+});
+
+/////////////////////////////////////
+//listening on localhost
 const port = 3000;
 app.listen(port, (req, res) =>{
   console.log('listening on port: ' + port);
 });
-/////////////////////////////////////
-//handling url params
