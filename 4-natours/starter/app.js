@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
 const fs = require('fs');
 //adding middleware's
+app.use(morgan('dev'));
 app.use(express.json());
 app.use((req, res, next) => {
     console.log('Hello from the middleware 👋');
     next();
 });  
+app.use(morgan('dev'));
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
     next();
@@ -139,6 +142,7 @@ const tours = JSON.parse(fs.readFileSync(`./dev-data/data/tours-simple.json`));
 /////////////////////////////////////
 //refractored version of the code above
 
+//route handlers
 const getTours = (req, res) => {
     res
     .status(200)
