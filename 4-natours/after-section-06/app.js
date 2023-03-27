@@ -1,31 +1,64 @@
-const express = require('express');
-const morgan = require('morgan');
+// const express = require('express');
+// const morgan = require('morgan');
 
-const tourRouter = require('./routes/tourRoutes');
-const userRouter = require('./routes/userRoutes');
+// const tourRouter = require('./routes/tourRoutes');
+// const userRouter = require('./routes/userRoutes');
+
+// const app = express();
+
+// // 1) MIDDLEWARES
+// if (process.env.NODE_ENV === 'development') {
+//   app.use(morgan('dev'));
+// }
+
+// app.use(express.json());
+// app.use(express.static(`${__dirname}/public`));
+
+// app.use((req, res, next) => {
+//   console.log('Hello from the middleware 👋');
+//   next();
+// });
+
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
+//   next();
+// });
+
+// // 3) ROUTES
+// app.use('/api/v1/tours', tourRouter);
+// app.use('/api/v1/users', userRouter);
+
+// module.exports = app;
+
+const express = require('express');
 
 const app = express();
 
-// 1) MIDDLEWARES
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
+// console.log(app);
+// console.log(express);
 
-app.use(express.json());
-app.use(express.static(`${__dirname}/public`));
+const port = 3000;
+ app.listen(port, () => {
+  console.log('port is on');
+  
+ });
 
-app.use((req, res, next) => {
-  console.log('Hello from the middleware 👋');
-  next();
+ app.get('/', (req, res) =>{
+  res
+  .status(200)
+  .json({message: 'Hello from main'});
+
 });
-
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  next();
+ app.get('/about', (req, res) =>{
+  res.send('hello to about');
 });
-
-// 3) ROUTES
-app.use('/api/v1/tours', tourRouter);
-app.use('/api/v1/users', userRouter);
-
-module.exports = app;
+ app.get('/exir', (req, res) =>{
+  res.send('hello to exit');
+});
+app.post('/', (req, res)=>{
+  res.send('you can post here')
+  .status(200);
+});
+app.use((req, res) => {
+  res.status(404).send('404 not found')
+});
