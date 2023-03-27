@@ -1,7 +1,17 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
+//adding middleware's
 app.use(express.json());
+app.use((req, res, next) => {
+    console.log('Hello from the middleware 👋');
+    next();
+});  
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    next();
+});
+
 
 /////////////////////////////////////
 //routing get requests using express.
@@ -134,6 +144,7 @@ const getTours = (req, res) => {
     .status(200)
     .json({
       status: 'success',
+      requestedAt: req.requestTime,
       data: {
         tours: tours
       }
@@ -193,13 +204,13 @@ const updateTourById = (req, res) => {
 
 app
   .route('/api/v1/tours')
-  .get(getTours)
-  .post(createTour)
+  .get(getTours)//request handler
+  .post(createTour)//request handler
 
 app
   .route('/api/v1/tours/:id')
-  .get(getTourById)
-  .patch(updateTourById)
+  .get(getTourById)//request handler
+  .patch(updateTourById)//request handler
 
 /////////////////////////////////////
 //listening on localhost
