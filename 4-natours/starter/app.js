@@ -205,7 +205,47 @@ const updateTourById = (req, res) => {
     //yet to be implemented
     res.end();
 }
-
+const getUserById = (req, res) => {
+    res
+    .status(500)
+    .json({
+        status: 'error',
+        message: 'This route is not supported yet'
+    })
+}
+const getTourUsers = (req, res) => {
+    res
+    .status(500)
+    .json({
+        status: 'error',
+        message: 'This route is not supported yet'
+    })
+}
+const createTourUsers = (req, res) => {
+    res
+    .status(500)
+    .json({
+        status: 'error',
+        message: 'This route is not supported yet'
+    })
+}
+const updateUserById = (req, res) => {
+    res
+    .status(500)
+    .json({
+        status: 'error',
+        message: 'This route is not supported yet'
+    })
+}
+const deleteUserById = (req, res) => {
+    res
+    .status(500)
+    .json({
+        status: 'error',
+        message: 'This route is not supported yet'
+    })
+}
+//routers used to define express object
 app
   .route('/api/v1/tours')
   .get(getTours)//request handler
@@ -216,7 +256,19 @@ app
   .get(getTourById)//request handler
   .patch(updateTourById)//request handler
 
+app
+  .route('/api/v1/users')
+  .get(getTourUsers)
+  .post(createTourUsers)
+
+app
+  .route('/api/v1/users/:id')
+  .get(getUserById)
+  .patch(updateUserById)
+  .delete(deleteUserById)
+
 /////////////////////////////////////
+
 //listening on localhost
 const port = 3000;
 app.listen(port, (req, res) =>{
