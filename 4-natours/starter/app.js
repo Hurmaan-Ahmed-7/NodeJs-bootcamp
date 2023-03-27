@@ -83,7 +83,7 @@ app.get('/api/v1/tours/:id', (req, res) => {
     const tour = tours.find(function (el){
         
         if(el.id == id){
-            console.log(el.id);
+            // console.log(el.id);
             return true;
         }
     });
@@ -108,6 +108,22 @@ app.get('/api/v1/tours/:id', (req, res) => {
     });
     }
     
+});
+/////////////////////////////////////
+//handling patch requests
+
+app.patch('/api/v1/tours/:id', (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const tour = tours.find(function (el){
+        
+        if(el.id == id){
+            // console.log(el.id);
+            return true;
+        }
+    }); 
+    //not implemented yet
+    //incomplete......
+
 });
 
 /////////////////////////////////////
