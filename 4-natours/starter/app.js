@@ -144,8 +144,4 @@ app.use('/api/v1/users', userRouter);
 
 /////////////////////////////////////
 
-//listening on localhost
-const port = 3000;
-app.listen(port, (req, res) =>{
-  console.log('listening on port: ' + port);
-});
+module.exports = app;
