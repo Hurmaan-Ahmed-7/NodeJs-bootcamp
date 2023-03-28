@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const fs = require('fs');
-//adding middleware's
+//importing routers
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+//adding random middleware's
 app.use(morgan('dev'));
 app.use(express.json());
 app.use((req, res, next) => {
@@ -14,7 +17,9 @@ app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
     next();
 });
-
+//routers used to define express object used as middleware
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 /////////////////////////////////////
 //routing get requests using express.
@@ -50,9 +55,6 @@ app.use((req, res, next) => {
 
 ////////////////////////////////////
 //building the natours api using REST
-
-const tours = JSON.parse(fs.readFileSync(`./dev-data/data/tours-simple.json`));
-
 // //sending json data to the client
 // //upon request.
 
@@ -139,133 +141,6 @@ const tours = JSON.parse(fs.readFileSync(`./dev-data/data/tours-simple.json`));
 
 // });
 
-/////////////////////////////////////
-//refractored version of the code above
-
-//route handlers
-const getTours = (req, res) => {
-    res
-    .status(200)
-    .json({
-      status: 'success',
-      requestedAt: req.requestTime,
-      data: {
-        tours: tours
-      }
-    })
-}
-const createTour = (req, res) => {
-    const newId = tours[tours.length - 1].id + 1;
-    const newTour = Object.assign({id: newId}, req.body);
-    tours.push(newTour);
-    fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(tours), err => {
-      res
-      .status(201)
-      .json({
-          status: 'success',
-          data: {
-              tour: newTour 
-          }
-      })
-    });
-}
-const getTourById = (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    
-    const tour = tours.find(function (el){
-        
-        if(el.id == id){
-            // console.log(el.id);
-            return true;
-        }
-    });
-    if(!tour){
-        res
-        .status(404)
-        .json({
-            status: '404 not found',
-            data: {
-                tour
-            }
-        });
-    }
-    else{
-    res
-    .status(200)
-    .json({
-        status: 'success',
-        data: {
-            tour
-        }
-    });
-    }
-}
-const updateTourById = (req, res) => {
-    console.log('Incomplete');
-    //yet to be implemented
-    res.end();
-}
-const getUserById = (req, res) => {
-    res
-    .status(500)
-    .json({
-        status: 'error',
-        message: 'This route is not supported yet'
-    })
-}
-const getTourUsers = (req, res) => {
-    res
-    .status(500)
-    .json({
-        status: 'error',
-        message: 'This route is not supported yet'
-    })
-}
-const createTourUsers = (req, res) => {
-    res
-    .status(500)
-    .json({
-        status: 'error',
-        message: 'This route is not supported yet'
-    })
-}
-const updateUserById = (req, res) => {
-    res
-    .status(500)
-    .json({
-        status: 'error',
-        message: 'This route is not supported yet'
-    })
-}
-const deleteUserById = (req, res) => {
-    res
-    .status(500)
-    .json({
-        status: 'error',
-        message: 'This route is not supported yet'
-    })
-}
-//routers used to define express object
-app
-  .route('/api/v1/tours')
-  .get(getTours)//request handler
-  .post(createTour)//request handler
-
-app
-  .route('/api/v1/tours/:id')
-  .get(getTourById)//request handler
-  .patch(updateTourById)//request handler
-
-app
-  .route('/api/v1/users')
-  .get(getTourUsers)
-  .post(createTourUsers)
-
-app
-  .route('/api/v1/users/:id')
-  .get(getUserById)
-  .patch(updateUserById)
-  .delete(deleteUserById)
 
 /////////////////////////////////////
 
