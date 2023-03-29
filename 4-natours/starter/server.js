@@ -3,16 +3,17 @@ require('dotenv').config(
 );
 const mongoose = require('mongoose');
 const app = require('./app');
+
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
-  })
-  .then(() => {
-    console.log('db connected successfully');
-  });
+// mongoose
+//   .connect(DB, {
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useFindAndModify: false
+//   })
+//   .then(() => {
+//     console.log('-------db connected successfully--------');
+//   });
 
 //listening on localhost
 const port = 3000;
