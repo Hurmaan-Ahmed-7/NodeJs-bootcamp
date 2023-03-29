@@ -11,6 +11,7 @@ Router
 Router
   .route('/:id')
   .get(tourController.getTourById)
-  .patch(tourController.updateTourById);
+  .patch(tourController.updateTourById)
+  .delete(tourController.deleteTourById);
 
 module.exports = Router;

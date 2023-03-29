@@ -1,6 +1,5 @@
 const fs = require('fs');
 const Tour = require('./../models/tourModel');
-
 //route handlers
 const getTours = async (req, res) => {
     try{
@@ -76,9 +75,6 @@ const getTourById = async (req, res) => {
 }
 const updateTourById = async (req, res) => {
     try{
-        console.log(req.body);
-        console.log(req.params.id);
-        
         const tour = 
         await Tour.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -105,10 +101,34 @@ const updateTourById = async (req, res) => {
           });
     }
 }
+const deleteTourById = async (req, res) => {
+    try{
+        const tour = 
+        await Tour.findByIdAndDelete(req.params.id);
+
+        res 
+         .status(200)
+         .json({
+            status: 'success',
+            data: null
+        });
+    }
+    catch(err){
+        console.log(err);
+        
+        res
+          .status('400')
+          .json({
+            status: 'failed',
+            message: err
+          });
+    }
+}
 
 module.exports = {
     getTours,
     createTour,
     getTourById,
-    updateTourById
+    updateTourById,
+    deleteTourById
 };
