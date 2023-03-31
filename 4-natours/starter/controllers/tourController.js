@@ -18,16 +18,28 @@ const getTours = async (req, res) => {
       //query using the formatted hard copy
       let queryObj = Tour.find(urlQueryObj);
       //receives object of type query since await is not used here
-      //we use the OG req.query here not the hard copy
+      
+      //SORTING query
+      //we use the OG req.query here & not the hard copy
       if(req.query.sort){
         const sortVars = req.query.sort.split(',').join(' ');
         // console.log(sortVars);
         queryObj = queryObj.sort(sortVars);
       }
-      const tours = await queryObj;
+      //FIELDING query
+      if(req.query.fields){
+        const fields = req.query.fields.split(',').join(' ');
+        queryObj = queryObj.select(fields);
+      }
+      else{
+        queryObj = queryObj.select('-__v');
+      }
 
+
+      //await here waits for the exec()method which turns the query object into array of documents
+      const tours = await queryObj;
       console.log(tours);
-      
+
       res
       .status(200)
       .json({
