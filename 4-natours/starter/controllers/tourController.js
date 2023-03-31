@@ -26,6 +26,7 @@ const getTours = async (req, res) => {
         // console.log(sortVars);
         queryObj = queryObj.sort(sortVars);
       }
+
       //FIELDING query
       if(req.query.fields){
         const fields = req.query.fields.split(',').join(' ');
@@ -35,6 +36,17 @@ const getTours = async (req, res) => {
         queryObj = queryObj.select('-__v');
       }
 
+      //PAGINATION
+      const page = req.query.page * 1 || 1;
+      const limit = req.query.limit * 1 || 30;
+      const skip = (page - 1) * limit;
+      queryObj = queryObj.skip(skip).limit(limit);
+      if(req.query.page){
+        const numOfTours = await Tour.countDocuments();
+        if(skip >= numOfTours){
+          throw new Error('no more data at this page');
+        }
+      }
 
       //await here waits for the exec()method which turns the query object into array of documents
       const tours = await queryObj;
