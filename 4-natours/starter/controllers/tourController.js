@@ -12,16 +12,16 @@ const top5CheapAlias = async (req, res, next) => {
 const getTours = async (req, res) => {
     try{
       const features = new ApiQueryFeatures(Tour.find(), req.query);
-      // features
-      //   .filter()
-      //   .sorting()
-      //   .fielding()
-      //   .pagination();
-      console.log(features);
-      console.log(features.filter());
-      console.log(features.sorting());
-      console.log(features.fielding());
-      console.log(features.pagination());
+      features
+        .filter()
+        .sorting()
+        .fielding()
+        .pagination();
+      // console.log(features);
+      // console.log(features.filter());
+      // console.log(features.sorting());
+      // console.log(features.fielding());
+      // console.log(features.pagination());
       
       //await here waits for the exec()method which turns the query object into array of documents
       const tours = await features.queryObj;
