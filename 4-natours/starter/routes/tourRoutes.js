@@ -1,8 +1,14 @@
 const express = require('express');
 const Router = express.Router();
 const tourController = require(`./../controllers/tourController`);
-//Router.param('id', tourController.checkID);
 
+//alias router
+Router
+  .route('/top-5-cheap')
+  .get(tourController.top5CheapAlias ,tourController.getTours)
+  .post(tourController.createTour);
+
+  //resource routers
 Router
   .route('/')
   .get(tourController.getTours)
