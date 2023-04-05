@@ -23,12 +23,24 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 //handle undefined routes
 app.all('*', (req, res, next)=> {
+
+  const err = new Error('cant find route');
+  err.status = 'fail';
+  err.statusCode = 404;
+
+  next(err);
+});
+//error handling middleware
+app.use((err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'error';
+
   res
-  .status(404)
+  .status(err.statusCode)
   .json({
-    status: 'fail',
-    message: `can not find route`
-  })
+    status: err.status,
+    message: err.message
+  });
 });
 /////////////////////////////////////
 
