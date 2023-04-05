@@ -21,7 +21,15 @@ app.use(morgan('dev'));
 //routers used to define express object used as middleware
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
-
+//handle undefined routes
+app.all('*', (req, res, next)=> {
+  res
+  .status(404)
+  .json({
+    status: 'fail',
+    message: `can not find route`
+  })
+});
 /////////////////////////////////////
 
 module.exports = app;
