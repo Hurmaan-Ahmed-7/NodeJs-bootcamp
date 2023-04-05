@@ -5,7 +5,7 @@ class ApiQueryFeatures{
       this.urlQueryObj = urlQueryObj;
     }
     filter(){
-      console.log('filtering...');
+      // console.log('filtering...');
       //hard storing the query from url
       let urlQueryObj = {...this.urlQueryObj};
       //formatting the hard copy to fit the parameter spec for mongoose methods
@@ -22,7 +22,7 @@ class ApiQueryFeatures{
     }
     sorting(){
       if(this.urlQueryObj.sort){
-      console.log('sorting...');
+      // console.log('sorting...');
       // console.log(this.urlQueryObj);
       const sortVars = this.urlQueryObj.sort.split(',').join(' ');
       this.queryObj = this.queryObj.sort(sortVars);
@@ -32,7 +32,7 @@ class ApiQueryFeatures{
     }
     fielding(){
       if(this.urlQueryObj.fields){
-      console.log('fielding...');
+      // console.log('fielding...');
       const fields = this.urlQueryObj.fields.split(',').join(' ');
       this.queryObj = this.queryObj.select(fields);
       }
@@ -40,7 +40,7 @@ class ApiQueryFeatures{
     }
     async pagination(){
       if(this.urlQueryObj.page){
-      console.log('paginating...');
+      // console.log('paginating...');
       const page = this.urlQueryObj.page * 1 || 1;
       const limit = this.urlQueryObj.limit * 1 || 30;
       const skip = (page - 1) * limit;

@@ -17,12 +17,7 @@ const getTours = async (req, res) => {
         .sorting()
         .fielding()
         .pagination();
-      // console.log(features);
-      // console.log(features.filter());
-      // console.log(features.sorting());
-      // console.log(features.fielding());
-      // console.log(features.pagination());
-      
+
       //await here waits for the exec()method which turns the query object into array of documents
       const tours = await features.queryObj;
       
@@ -147,11 +142,115 @@ const deleteTourById = async (req, res) => {
     }
 }
 
+const getTourStats = async (req, res) =>{
+  try{
+    const stats = await Tour.aggregate([
+      {
+        $match: {ratingsAverage: {$gte: 4.5}}
+      },
+      {
+        $group: {
+          _id: '$difficulty',
+          numTours: {$sum: 1},
+          numRatings: {$sum: '$ratingsQuantity'},
+          avgRating: {$avg: 'ratingsAverage'},
+          avgPrice: {$avg: '$price'},
+          minPrice: {$min: '$price'},
+          maxprice: {$max: '$price'}
+
+        }
+      },
+      {
+        $sort: {
+          avgPrice: 1
+        }
+      }
+    ]);
+    res 
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          stats
+         }
+      });
+  }
+  catch(err){
+    console.log(err);
+        
+        res
+          .status('400')
+          .json({
+            status: 'failed',
+            message: err
+          });
+  }
+};
+const getMonthlyPlan = async (req, res) =>{
+  try{
+    const year = req.params.year * 1;
+    console.log(typeof year);
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates'
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          numTourStarts: { $sum: 1 },
+          tours: { $push: '$name' }
+        }
+      },
+      {
+        $addFields: { month: '$_id' }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      },
+      {
+        $sort: { numTourStarts: -1 }
+      },
+      {
+        $limit: 12
+      }
+    ]);
+    res 
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          plan
+         }
+      });
+  }
+  catch(err){
+    console.log(err);
+        
+        res
+          .status('400')
+          .json({
+            status: 'failed',
+            message: err
+          });
+  }
+};
 module.exports = {
     getTours,
     createTour,
     getTourById,
     updateTourById,
     deleteTourById,
-    top5CheapAlias
+    top5CheapAlias,
+    getTourStats,
+    getMonthlyPlan
 };

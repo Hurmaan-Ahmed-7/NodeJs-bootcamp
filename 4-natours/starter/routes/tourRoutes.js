@@ -7,8 +7,13 @@ Router
   .route('/top-5-cheap')
   .get(tourController.top5CheapAlias ,tourController.getTours)
   .post(tourController.createTour);
-
-  //resource routers
+//resource routers
+Router
+  .route('/tour-stats')
+  .get(tourController.getTourStats);
+Router
+  .route('/monthly-plan/:year')
+  .get(tourController.getMonthlyPlan);
 Router
   .route('/')
   .get(tourController.getTours)
