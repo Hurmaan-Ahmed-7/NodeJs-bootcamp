@@ -2,35 +2,24 @@ const express = require('express');
 
 const app = express();
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
 
 //importing routers to be used as middleware
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
-//adding random middleware's
+//add random middleware's
 app.use(morgan('dev'));
 app.use(express.json());
-app.use((req, res, next) => {
-  //console.log('Hello from the middleware 👋');
-  next();
-});
 app.use(morgan('dev'));
-// app.use((req, res, next) => {
-//   req.requestTime = new Date().toISOString();
-//   next();
-// });
-//routers used to define express object used as middleware
+//add routers as middleware's
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
-//handle undefined routes
+//middleware for handling undefined routes
 app.all('*', (req, res, next)=> {
-
-  const err = new Error('cant find route');
-  err.status = 'fail';
-  err.statusCode = 404;
-
+  const err = new AppError('cant find route', 404);
   next(err);
 });
-//error handling middleware
+//global error handling middleware for operational errors - common exit for all routes
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
