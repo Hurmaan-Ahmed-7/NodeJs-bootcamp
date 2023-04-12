@@ -15,7 +15,7 @@ app.use(morgan('dev'));
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 //middleware for handling undefined routes
-app.all('*', (req, res, next)=> {
+app.all('*', (req, res, next) => {
   const err = new AppError('cant find route', 404);
   next(err);
 });
