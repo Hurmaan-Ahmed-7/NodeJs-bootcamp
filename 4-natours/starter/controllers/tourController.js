@@ -1,6 +1,7 @@
 const Tour = require('./../models/tourModel');
 const ApiQueryFeatures = require('./../utils/apiFeatures.js');
 const catchAsync = require('./../utils/catchAsync.js');
+const AppError = require('./../utils/appError.js');
 //alias'
 const top5CheapAlias = async (req, res, next) => {
   req.query.limit = '5';
@@ -15,6 +16,9 @@ const getTours = catchAsync(async (req, res, next) => {
 
   //await here waits for the exec()method which turns the query object into array of documents
   const tours = await features.queryObj;
+  if(!tours){
+    return next(new AppError('No tour found with that ID', 404));
+  }
   res.status(200).json({
     status: 'success',
     requestedAt: req.requestTime,
@@ -35,7 +39,9 @@ const createTour = catchAsync(async (req, res, next) => {
 });
 const getTourById = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
-
+  if(!tour){
+    return next(new AppError('No tour found with that ID', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -49,7 +55,9 @@ const updateTourById = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
-
+  if(!tour){
+    return next(new AppError('No tour found with that ID', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -59,7 +67,9 @@ const updateTourById = catchAsync(async (req, res, next) => {
 });
 const deleteTourById = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
-
+  if(!tour){
+    return next(new AppError('No tour found with that ID', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: null,
