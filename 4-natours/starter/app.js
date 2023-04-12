@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const AppError = require('./utils/appError');
-
+const errorHandler = require('./controllers/errorHandler');
 //importing routers to be used as middleware
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -20,17 +20,7 @@ app.all('*', (req, res, next)=> {
   next(err);
 });
 //global error handling middleware for operational errors - common exit for all routes
-app.use((err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
-
-  res
-  .status(err.statusCode)
-  .json({
-    status: err.status,
-    message: err.message
-  });
-});
+app.use(errorHandler);
 /////////////////////////////////////
 
 module.exports = app;
