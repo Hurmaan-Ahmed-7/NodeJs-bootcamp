@@ -29,4 +29,12 @@ process.on('unhandledRejection', (err) => {
   serverOn.close(() => {
     process.exit(1);
   });
+
+  process.on('uncaughtException', (err) => {
+    console.log(err.name, err.message);
+    console.log('uncaught exception, shutting down');
+    serverOn.close(() => {
+      process.exit(1);
+    });
+  });
 });
