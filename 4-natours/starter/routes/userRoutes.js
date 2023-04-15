@@ -1,11 +1,15 @@
 const express = require('express');
-const Router = express.Router();
-const controller = require(`./../controllers/userController`);
-Router.route('/').get(controller.getTourUsers).post(controller.createTourUsers);
+const router = express.Router();
+const userController = require(`./../controllers/userController`);
+const authController = require(`./../controllers/authController`);
 
-Router.route('/:id')
-  .get(controller.getUserById)
-  .patch(controller.updateUserById)
-  .delete(controller.deleteUserById);
+router.route('/signup').post(authController.signup);
 
-module.exports = Router;
+router.route('/').get(userController.getTourUsers).post(userController.createTourUsers);
+
+router.route('/:id')
+  .get(userController.getUserById)
+  .patch(userController.updateUserById)
+  .delete(userController.deleteUserById);
+
+module.exports = router;
