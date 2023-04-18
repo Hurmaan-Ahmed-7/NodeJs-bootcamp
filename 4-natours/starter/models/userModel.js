@@ -44,7 +44,12 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpires: Date
+  passwordResetExpires: Date,
+  active:{
+    type: Boolean,
+    default: true,
+    select: false
+  }
 });
 //DB middleware to crypt password before saving to DB
 userSchema.pre('save', async function(next) {
@@ -55,6 +60,17 @@ userSchema.pre('save', async function(next) {
 
   next();
 });
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+userSchema.pre(/^find/, function(next) {
+  this.find({ active: { $ne: false }});
+  next();
+});
+
 //adding custom mongoose methods
 userSchema.methods.correctPassword = async function(
   candidatePassword,

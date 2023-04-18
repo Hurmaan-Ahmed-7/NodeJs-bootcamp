@@ -34,7 +34,16 @@ const updateMe = catchAsync(async (req, res, next) => {
     }
   });
 });
+const deleteMe = catchAsync(async (req, res, next) => {
+  console.log(req.user);
+  
+  await User.findByIdAndUpdate(req.user.id, { active: false });
 
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+});
 const getTourUsers = catchAsync(
   async (req, res, next) => {
     const users = await User.find();
@@ -76,5 +85,6 @@ module.exports = {
   createTourUsers,
   updateUserById,
   deleteUserById,
-  updateMe
+  updateMe,
+  deleteMe
 };
