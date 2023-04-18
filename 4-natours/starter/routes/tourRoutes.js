@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tourController = require(`./../controllers/tourController`);
-
+authController = require('./../controllers/authController');
 //alias router
 router
   .route('/top-5-cheap')
@@ -15,6 +15,6 @@ router
   .route('/:id')
   .get(tourController.getTourById)
   .patch(tourController.updateTourById)
-  .delete(tourController.deleteTourById);
+  .delete(authController.protect, authController.restrict('admin', 'lead-guide'), tourController.deleteTourById);
 
 module.exports = router;
