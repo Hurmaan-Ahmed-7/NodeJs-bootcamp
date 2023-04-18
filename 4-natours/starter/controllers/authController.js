@@ -1,4 +1,5 @@
 const User = require('./../models/userModel');
+const { promisify } = require('util');
 const catchAsync = require('./../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const AppError = require('./../utils/appError');
@@ -11,6 +12,18 @@ const signToken = id => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user
+    }
+  });
+};
+
 const signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -19,34 +32,23 @@ const signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm
   });
 
-  const token = signToken(newUser._id);
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser
-    }
-  });
+  createSendToken(newUser, 201, res);
 });
 
 const login = catchAsync(async (req, res, next) => {
-  if (!req.body.email || !req.body.password) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return next(new AppError('Please provide email and password', 400));
   }
-
-  const { email, password } = req.body;
   const user = await User.findOne({ email }).select('+password');
+
   const correct = await user.correctPassword(password, user.password);
 
   if (!user || !correct) {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const token = signToken(user._id);
-  res.status(201).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 200, res);
 });
 
 const protect = catchAsync(async (req, res, next) => {
@@ -64,7 +66,7 @@ const protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET_KEY);
   const freshUser = await User.findById(decoded.id);
   if (!freshUser) {
     return next(
@@ -130,12 +132,12 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 const resetPassword = catchAsync(async (req, res, next) => {
-  console.log('hello');
-  
+
   const hashedToken = crypto
     .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
+
   const user = await User.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: Date.now() } });
 
   if (!user) {
@@ -147,11 +149,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 200, res);
 });
 const updatePassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
@@ -161,11 +159,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 200, res);
 });
 
 module.exports = {
