@@ -1,5 +1,15 @@
 const AppError = require('../utils/appError');
 
+const JsonWebTokenError = (err) => {
+  console.log('ja');
+  
+  const message = 'Invalid token. Please login again';
+  return new AppError(message, 401);
+};
+const TokenExpiredError = (err) => {
+  const message = 'Your token has expired. Please login again';
+  return new AppError(message, 401);
+};
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
@@ -31,7 +41,7 @@ const sendErrorprod = (err, res) => {
       message: err.message,
     });
   }
-  //programming errors
+  //programming errors or unhandled errors
   else {
     console.error('ERROR', err);
     res.status(500).json({
@@ -44,9 +54,10 @@ const sendErrorprod = (err, res) => {
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
-
+//in dev, we dont have to format the operational errors
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
+//in prod, we have to format the operational errors
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
 
@@ -58,6 +69,12 @@ module.exports = (err, req, res, next) => {
     }
     if (err.code === 11000) {
       error = handleDuplicateFieldsDB(error);
+    }
+    if (err.name === 'JsonWebTokenError') {
+      error = JsonWebTokenError(error);
+    }
+    if (err.name === 'TokenExpiredError') {
+      error = TokenExpiredError(error);
     }
 
     sendErrorprod(error, res);

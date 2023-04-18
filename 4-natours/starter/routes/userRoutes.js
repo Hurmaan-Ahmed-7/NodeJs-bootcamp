@@ -5,9 +5,12 @@ const authController = require(`./../controllers/authController`);
 
 router.route('/signup').post(authController.signup);
 router.route('/login').post(authController.login);
-router.route('/').get(userController.getTourUsers).post(userController.createTourUsers);
-
-router.route('/:id')
+router
+  .route('/')
+  .get(authController.protect, userController.getTourUsers)
+  .post(userController.createTourUsers);
+router
+  .route('/:id')
   .get(userController.getUserById)
   .patch(userController.updateUserById)
   .delete(userController.deleteUserById);

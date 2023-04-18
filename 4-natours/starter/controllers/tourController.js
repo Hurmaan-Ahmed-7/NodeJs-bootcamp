@@ -12,19 +12,25 @@ const top5CheapAlias = async (req, res, next) => {
 //route handlers
 const getTours = catchAsync(async (req, res, next) => {
   const features = new ApiQueryFeatures(Tour.find(), req.query);
-  features.filter().sorting().fielding().pagination();
+  features
+    .filter()
+    .sorting()
+    .fielding()
+    .pagination();
 
   //await here waits for the exec()method which turns the query object into array of documents
   const tours = await features.queryObj;
-  if(!tours){
+
+  //normally error is not generated for this query result, hence we are inducing an error.
+  if (!tours) {
     return next(new AppError('No tour found with that ID', 404));
   }
   res.status(200).json({
     status: 'success',
     requestedAt: req.requestTime,
     data: {
-      tours: tours,
-    },
+      tours: tours
+    }
   });
 });
 const createTour = catchAsync(async (req, res, next) => {
@@ -33,53 +39,53 @@ const createTour = catchAsync(async (req, res, next) => {
   res.status(201).json({
     status: 'success',
     data: {
-      tour: newTour,
-    },
+      tour: newTour
+    }
   });
 });
 const getTourById = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
-  if(!tour){
+  if (!tour) {
     return next(new AppError('No tour found with that ID', 404));
   }
   res.status(200).json({
     status: 'success',
     data: {
-      tour,
-    },
+      tour
+    }
   });
 });
 
 const updateTourById = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true,
+    runValidators: true
   });
-  if(!tour){
+  if (!tour) {
     return next(new AppError('No tour found with that ID', 404));
   }
   res.status(200).json({
     status: 'success',
     data: {
-      tour,
-    },
+      tour
+    }
   });
 });
 const deleteTourById = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
-  if(!tour){
+  if (!tour) {
     return next(new AppError('No tour found with that ID', 404));
   }
   res.status(200).json({
     status: 'success',
-    data: null,
+    data: null
   });
 });
 
 const getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
-      $match: { ratingsAverage: { $gte: 4.5 } },
+      $match: { ratingsAverage: { $gte: 4.5 } }
     },
     {
       $group: {
@@ -89,20 +95,20 @@ const getTourStats = catchAsync(async (req, res, next) => {
         avgRating: { $avg: 'ratingsAverage' },
         avgPrice: { $avg: '$price' },
         minPrice: { $min: '$price' },
-        maxprice: { $max: '$price' },
-      },
+        maxprice: { $max: '$price' }
+      }
     },
     {
       $sort: {
-        avgPrice: 1,
-      },
-    },
+        avgPrice: 1
+      }
+    }
   ]);
   res.status(200).json({
     status: 'success',
     data: {
-      stats,
-    },
+      stats
+    }
   });
 });
 const getMonthlyPlan = catchAsync(async (req, res, next) => {
@@ -110,43 +116,43 @@ const getMonthlyPlan = catchAsync(async (req, res, next) => {
   console.log(typeof year);
   const plan = await Tour.aggregate([
     {
-      $unwind: '$startDates',
+      $unwind: '$startDates'
     },
     {
       $match: {
         startDates: {
           $gte: new Date(`${year}-01-01`),
-          $lte: new Date(`${year}-12-31`),
-        },
-      },
+          $lte: new Date(`${year}-12-31`)
+        }
+      }
     },
     {
       $group: {
         _id: { $month: '$startDates' },
         numTourStarts: { $sum: 1 },
-        tours: { $push: '$name' },
-      },
+        tours: { $push: '$name' }
+      }
     },
     {
-      $addFields: { month: '$_id' },
+      $addFields: { month: '$_id' }
     },
     {
       $project: {
-        _id: 0,
-      },
+        _id: 0
+      }
     },
     {
-      $sort: { numTourStarts: -1 },
+      $sort: { numTourStarts: -1 }
     },
     {
-      $limit: 12,
-    },
+      $limit: 12
+    }
   ]);
   res.status(200).json({
     status: 'success',
     data: {
-      plan,
-    },
+      plan
+    }
   });
 });
 module.exports = {
@@ -157,5 +163,5 @@ module.exports = {
   deleteTourById,
   top5CheapAlias,
   getTourStats,
-  getMonthlyPlan,
+  getMonthlyPlan
 };

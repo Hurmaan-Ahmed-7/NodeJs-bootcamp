@@ -1,6 +1,7 @@
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync.js');
 const AppError = require('./../utils/appError.js');
+const authController = require('./authController.js');
 
 const getTourUsers = catchAsync(
   async (req, res, next) => {
