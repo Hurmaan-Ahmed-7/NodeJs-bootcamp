@@ -11,7 +11,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       maxlength: [40, 'A tour name must have less or equal then 40 characters'],
-      minlength: [10, 'A tour name must have more or equal then 10 characters'],
+      minlength: [10, 'A tour name must have more or equal then 10 characters']
       // validate: [validator.isAlpha, 'Tour name must only contain characters']
     },
     slug: String,
@@ -103,8 +103,12 @@ const tourSchema = new mongoose.Schema(
         day: Number
       }
     ],
-    guides: Array
-
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   {
     toJSON: { virtuals: true },
@@ -124,17 +128,14 @@ tourSchema.pre('save', function(next) {
 
 // QUERY MIDDLEWARE
 
-tourSchema.pre('save', async function(next) {
-  const guidesPromises = this.guides.map(async id => {
-  return await User.findById(id); 
-  });
-  console.log(this.guides);
-  console.log(guidesPromises);
-  this.guides = await Promise.all(guidesPromises);
-  console.log(this.guides);
-  console.log(guidesPromises);
-  next();
-});
+//embedding relationship
+// tourSchema.pre('save', async function(next) {
+//   const guidesPromises = this.guides.map(async id => {
+//   return await User.findById(id);
+//   });
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 
 tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } });
@@ -142,7 +143,13 @@ tourSchema.pre(/^find/, function(next) {
   this.start = Date.now();
   next();
 });
-
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt'
+  })
+  next();
+});
 tourSchema.post(/^find/, function(docs, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
   next();
